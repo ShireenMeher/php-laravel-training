@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Users;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -11,88 +12,103 @@ class UsersController extends Controller
     //
     public function createUser(Request $request){
 
+        $users = DB::table('users')->insert([
+            'name' => $request->name,
+            'email' => $request->email,
+            'phoneNo' => $request->phoneNo,
+        ]);
 
+        return response()->json([
+            "msg"=>"User $request->name is created successfully!\n"
+        ], 201);
 
-        try{
-            $users = DB::table('users')->insert([
-                'name' => $request->name,
-                'email' => $request->email,
-                'phoneNo' => $request->phoneNo,
-            ]);
-        }
-        // catch block is executed when an exception is thrown in the try block
-        // an object $e of Exception class is created
-        catch(Exception $e){
-            echo "\n". "Caught exception: " . $e->getMessage(); //Exception handling
-        }
-        $this->renderable(function (NotFoundHttpException $e, $request) {
-            if ($request->is('api/users')) {
-                return response()->json([
-                    'message' => 'Record not found.'
-                ], 404);
-            }
-        });
-
-        echo "User $request->name is created successfully!\n";
-        return $users;
 
     }
 
 
     public function getUserByName($username){
 
-        $user = DB::table('users')->where('name', $username)->first();
-        return $user;
+        if (Users::where('name', $username)->exists()) {
+            $user = Users::where('name', $username)->get()->toJson(JSON_PRETTY_PRINT);
+            return response($user, 200);
+        } else {
+            return response()->json([
+                "message" => "Username doesn't exist!"
+            ], 404);
+        }
+
     }
 
     public function getUsersByEmail($e_mail){
 
-        $users = DB::table('users')->where('email', $e_mail)->get();
-        return $users;
+        if (Users::where('email', $e_mail)->exists()) {
+            $user = Users::where('email', $e_mail)->get()->toJson(JSON_PRETTY_PRINT);
+            return response($user, 200);
+        } else {
+            return response()->json([
+                "message" => "User email doesn't exist!"
+            ], 404);
+        }
     }
 
     public function getUserByPhoneNo($phone_no){
 
-        $user = DB::table('users')->where('phoneNo', $phone_no)->first();
-        return $user;
+        if (Users::where('phoneNo', $phone_no)->exists()) {
+            $user = Users::where('phoneNo', $phone_no)->get()->toJson(JSON_PRETTY_PRINT);
+            return response($user, 200);
+        } else {
+            return response()->json([
+                "message" => "Phone number doesn't exist!"
+            ], 404);
+        }
     }
 
 
 
     public function getAllUsers(){
-        $users = DB::table('users')->get();
-//        $names = array();
-//        $phone_numbers = array();
-//
-//        foreach ($users as $user){
-//            array_push($names, $user['name']);
-//            array_push($phone_numbers, $user['phoneNo']);
-//        }
-//
-//        return response()->json(['phoneNo'=> $phone_numbers, 'name' => $users[]]);
-//        ['phoneNo'=> $users['phoneNo']]
-
-        return $users;
+        $users = Users::get()->toJson(JSON_PRETTY_PRINT);
+        return response($users, 200);
     }
 
     public function deleteUserByPhoneNo($phone_number){
+        if(Users::where('phoneNo', $phone_number)->exists()){
         DB::table('users')->where('phoneNo',$phone_number)->delete();
-
-        echo "User deleted successfully!";
+        return response()->json([
+            "message" => "User successfully deleted!"
+        ], 202);
+        } else {
+        return response()->json([
+        "message" => "Phone number doesn't exist!!"
+        ], 404);
+        }
 
     }
 
     public function deleteUserByName($username){
-        DB::table('users')->where('name',$username)->delete();
-
-        echo "User deleted successfully!";
+        if(Users::where('name', $username)->exists()){
+            DB::table('users')->where('name',$username)->delete();
+            return response()->json([
+                "message" => "User successfully deleted!"
+            ], 202);
+        } else {
+            return response()->json([
+                "message" => "User name doesn't exist!!"
+            ], 404);
+        }
 
     }
 
     public function deleteUserByEmail($email){
-        DB::table('users')->where('email',$email)->delete();
-
-        echo "User deleted successfully!";
+        if(Users::where('email', $email)->exists()){
+            DB::table('users')->where('email',$email)->delete();
+            return response()->json([
+                "message" => "User successfully deleted!"
+            ], 202);
+        } else {
+            return response()->json([
+                "message" => "User email doesn't exist!!"
+            ], 404);
+        }
 
     }
 
