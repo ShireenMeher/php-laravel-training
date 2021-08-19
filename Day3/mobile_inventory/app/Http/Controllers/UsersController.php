@@ -5,22 +5,38 @@ namespace App\Http\Controllers;
 use App\Models\Users;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Illuminate\Support\Facades\Validator;
 
 class UsersController extends Controller
 {
-    //
+
+
     public function createUser(Request $request){
 
-        $users = DB::table('users')->insert([
-            'name' => $request->name,
-            'email' => $request->email,
-            'phoneNo' => $request->phoneNo,
-        ]);
+        $rules = array(
+            "name"=> "required|min:2|max:25",
+            "email" => "required|email",
+            "phoneNo" => "required|unique:users|digits:10",
+        );
 
-        return response()->json([
-            "msg"=>"User $request->name is created successfully!\n"
-        ], 201);
+        $validator = Validator::make($request->all(), $rules);
+
+        if($validator->fails())
+        {
+            return response()->json($validator->errors(), 400);
+        }
+
+        else {
+            $users = DB::table('Users')->insert([
+                'name' => $request->name,
+                'email' => $request->email,
+                'phoneNo' => $request->phoneNo,
+            ]);
+
+            return response()->json([
+                "msg" => "User $request->name is created successfully!"
+            ], 201);
+        }
 
 
     }
