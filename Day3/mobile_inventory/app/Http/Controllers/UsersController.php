@@ -3,14 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\createUserRequest;
-use App\Models\Service;
 use App\Models\Servicse;
 
 class UsersController extends Controller
 {
     protected $service;
 
-    public function __construct(Service $service)
+    public function __construct(Servicse $service)
     {
         $this->service = $service;
     }

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
-class Service extends Model
+class Servicse extends Model
 {
     public function createUser(createUserRequest $request){
 
