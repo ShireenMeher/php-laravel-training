@@ -16,13 +16,15 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::post('/users',[UsersController::class, 'createUser']);
+
 Route::get('/users',[UsersController::class, 'getAllUsers']);
-Route::get('/users/name/{username}',[UsersController::class,'getUserByName']);
-Route::get('/users/number/{phone_number}',[UsersController::class,'getUserByPhoneNo']);
-Route::get('/users/e_mail/{e_mail}',[UsersController::class,'getUsersByEmail']);
-Route::delete('/users/name/{username}',[UsersController::class,'deleteUserByName']);
-Route::delete('/users/e_mail/{email}',[UsersController::class,'deleteUserByEmail']);
-Route::delete('/users/phoneNo/{phone_number}',[UsersController::class,'deleteUserByPhoneNo']);
+Route::get('/users/search/byName/{username}',[UsersController::class,'getUserByName']);
+Route::get('/users/search/byPhoneNo/{phone_number}',[UsersController::class,'getUserByPhoneNo']);
+Route::get('/users/search/byEmail/{email}',[UsersController::class,'getUsersByEmail']);
+
+Route::delete('/users/byName/{username}',[UsersController::class,'deleteUserByName']);
+Route::delete('/users/byEmail/{email}',[UsersController::class,'deleteUserByEmail']);
+Route::delete('/users/byPhoneNo/{phone_number}',[UsersController::class,'deleteUserByPhoneNo']);
 
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {

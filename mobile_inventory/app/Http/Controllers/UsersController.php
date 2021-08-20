@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\createUserRequest;
 use App\Models\Users;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -11,32 +12,15 @@ class UsersController extends Controller
 {
 
 
-    public function createUser(Request $request){
+    public function createUser(createUserRequest $request){
 
-        $rules = array(
-            "name"=> "required|min:2|max:25",
-            "email" => "required|email",
-            "phoneNo" => "required|unique:users|digits:10",
-        );
-
-        $validator = Validator::make($request->all(), $rules);
-
-        if($validator->fails())
-        {
-            return response()->json($validator->errors(), 400);
-        }
-
-        else {
-            $users = DB::table('Users')->insert([
-                'name' => $request->name,
-                'email' => $request->email,
-                'phoneNo' => $request->phoneNo,
-            ]);
+        $user = Users::create(['name'=>$request->name, 'phoneNo'=>$request->phoneNo, 'email' =>$request->email]);
 
             return response()->json([
+                "user" => $user,
                 "msg" => "User $request->name is created successfully!"
             ], 201);
-        }
+
 
 
     }
@@ -45,7 +29,7 @@ class UsersController extends Controller
     public function getUserByName($username){
 
         if (Users::where('name', $username)->exists()) {
-            $user = Users::where('name', $username)->get()->toJson(JSON_PRETTY_PRINT);
+            $user = Users::where('name', $username)->get();
             return response($user, 200);
         } else {
             return response()->json([
@@ -58,8 +42,8 @@ class UsersController extends Controller
     public function getUsersByEmail($e_mail){
 
         if (Users::where('email', $e_mail)->exists()) {
-            $user = Users::where('email', $e_mail)->get()->toJson(JSON_PRETTY_PRINT);
-            return response($user, 200);
+            $user = Users::where('email', $e_mail)->get();
+            return response()->json(["user" => $user], 200);
         } else {
             return response()->json([
                 "message" => "User email doesn't exist!"
